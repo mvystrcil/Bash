@@ -1,17 +1,17 @@
 #!/bin/bash
 
 function changeWallpaper {
-	echo "Changing wallpaper"
 	PICTURE=$(ls $FOLDER/*.jpg | shuf -n1)
-        eval "$COMMAND"
+	EVAL="$COMMAND$PICTURE"
+        eval "$EVAL"
 }
 
 # Support more desktop managers - automatically choose available one
 # Please keep order in SET<-->GET arrays
-GET_COMMANDS=("gsettings get org.mate.background picture-uri"
+GET_COMMANDS=("gsettings get org.mate.background picture-filename"
 		"gsettings get org.gnome.desktop.background picture-uri")
 
-SET_COMMANDS=("gsettings set org.mate.background picture-uri"
+SET_COMMANDS=("gsettings set org.mate.background picture-filename "
 		"gsettings set org.gnome.desktop.background picture-uri file://")
 
 CRON=""
@@ -61,7 +61,7 @@ fi
 # Figure out which environment should be used
 for command in ${!GET_COMMANDS[*]}
 do
-	eval "${GET_COMMANDS[$command]}" >> /dev/null 2>&1
+	eval "${GET_COMMANDS[$command]}" > /dev/null 2>&1
 	if [ $? -eq 0 ]; then
 		COMMAND="${SET_COMMANDS[$command]}"
 		break
