@@ -1,5 +1,11 @@
 #!/bin/bash
 
+function changeWallpaper {
+	echo "Changing wallpaper"
+	PICTURE=$(ls $FOLDER/*.jpg | shuf -n1)
+        eval "$COMMAND"
+}
+
 # Support more desktop managers - automatically choose available one
 # Please keep order in SET<-->GET arrays
 GET_COMMANDS=("gsettings get org.mate.background picture-uri"
@@ -8,16 +14,23 @@ GET_COMMANDS=("gsettings get org.mate.background picture-uri"
 SET_COMMANDS=("gsettings set org.mate.background picture-uri"
 		"gsettings set org.gnome.desktop.background picture-uri file://")
 
+CRON=""
+
 # Parse input arguments if any
-while getopts f:t: option
+while getopts f:t:c option
 do
         case "${option}"
         in
+		c ) CRON="EXIT"
+			;;
                 f ) FOLDER=${OPTARG}
                         ;;
                 t ) TIME=${OPTARG}
                         ;;
-                * ) echo "Usage: $0 [-f folder -t timeout]"
+                * ) echo -e "Usage: $0 [-f folder -t timeout -c]"
+		    echo -e "\t -f folder with wallpapers to change between"
+		    echo -e "\t -t specify timeout how fast change"
+		    echo -e "\t -c only if used in cron"
                         exit
                         ;;
         esac
@@ -55,14 +68,16 @@ do
 	fi
 done
 
-echo "Will use $COMMAND"
 echo "Wallpapers from: $FOLDER"
 echo "Timeout change: $TIME"
 
+if [ "$CRON" == "EXIT" ];then
+	changeWallpaper
+	exit
+fi
 
 # Change wallpaper in loop
 while true;do
 	sleep $TIME
-	PICTURE=$(ls $FOLDER/*.jpg | shuf -n1)
-	eval "$COMMAND"
+	changeWallpaper
 done
