@@ -1,8 +1,12 @@
 #!/bin/bash
 
 # Support more desktop managers - automatically choose available one
-COMMANDS=("gsettings get org.mate.background picture-uri"
-          "gsettings get org.gnome.desktop.background picture-uri")
+# Please keep order in SET<-->GET arrays
+GET_COMMANDS=("gsettings get org.mate.background picture-uri"
+		"gsettings get org.gnome.desktop.background picture-uri")
+
+SET_COMMANDS=("gsettings set org.mate.background picture-uri"
+		"gsettings set org.gnome.desktop.background picture-uri file://")
 
 # Parse input arguments if any
 while getopts f:t: option
@@ -19,7 +23,7 @@ do
         esac
 done
 
-# User didn't specified Wallpepers folder - try to use some default
+# User didn't specified Wallpapers folder - try to use some default
 if [ -z $FOLDER ]; then
 	# Check for default PICTURE directory location
 	if [ -z $XDG_PICTURES_DIR ]; then
@@ -42,11 +46,11 @@ if [ -z $TIME ]; then
 fi
 
 # Figure out which environment should be used
-for command in ${!COMMANDS[*]}
+for command in ${!GET_COMMANDS[*]}
 do
-	eval "${COMMANDS[$command]}" >> /dev/null 2>&1
+	eval "${GET_COMMANDS[$command]}" >> /dev/null 2>&1
 	if [ $? -eq 0 ]; then
-		COMMAND="${COMMANDS[$command]}"
+		COMMAND="${SET_COMMANDS[$command]}"
 		break
 	fi
 done
