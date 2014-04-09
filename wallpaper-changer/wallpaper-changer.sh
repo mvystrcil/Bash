@@ -2,7 +2,7 @@
 
 function changeWallpaper {
 	PICTURE=$(ls $FOLDER/*.jpg | shuf -n1)
-	EVAL="$COMMAND$PICTURE"
+	EVAL="$COMMAND'$PICTURE'"
         eval "$EVAL"
 }
 
